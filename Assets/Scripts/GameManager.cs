@@ -8,11 +8,10 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    private int _score = -2;
+    private int _score = -1;
     [SerializeField] private Text scoreText;
     [SerializeField] private Text menuTitleText;
     [SerializeField] private GameObject menu;
-    [SerializeField] private Transform platformSpawn;
     private bool _gameOver;
     private bool _menuing;
     
@@ -22,7 +21,7 @@ public class GameManager : MonoBehaviour
         menu.SetActive(false);
         SetUpScene();
         Time.timeScale = 1;
-        StartCoroutine(InstantiateNextPlatform(1.5f, 100));
+        StartCoroutine(InstantiateNextPlatform());
     }
 
     private void Update()
@@ -55,28 +54,37 @@ public class GameManager : MonoBehaviour
 
     private void SetUpScene()
     {
-        Instantiate(Resources.Load("Prefabs/BasePlatform"));
+        Instantiate(Resources.Load("Prefabs/BasePlatform"),transform);
         Instantiate(Resources.Load("Prefabs/Wizard"),transform);
     }
     
-    public IEnumerator InstantiateNextPlatform(float interval, int invokeCount)
+    public IEnumerator InstantiateNextPlatform()
     {
-        for (int i = 0; i < invokeCount; i++)
+        while(true)
         {
             GameObject nextPlatform = Resources.Load("Prefabs/Platform") as GameObject;
-            nextPlatform.transform.localScale = new Vector3(Random.Range(3,6), Random.Range(2,4), 1);
-            Instantiate(nextPlatform,platformSpawn);
-            _score += 1;
-            if (_score >= 0)
-            {
-                scoreText.text = "Score : "+_score.ToString();
-            }
-            yield return new WaitForSeconds(interval);
+            nextPlatform.transform.localScale = new Vector3(Random.Range(3,6), Random.Range(2,6), 1);
+            Instantiate(nextPlatform,transform);
+            yield return new WaitForSeconds(1.5f);
         }
     }
 
     public void SetGameOver()
     {
         _gameOver = true;
+    }
+
+    public int GetScore()
+    {
+        return _score;
+    }
+
+    public void UpScore()
+    {
+        _score += 1;
+        if (_score >= 0)
+        {
+            scoreText.text = "Score : "+_score.ToString();
+        }
     }
 }
